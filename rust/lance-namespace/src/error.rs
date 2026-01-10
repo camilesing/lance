@@ -222,6 +222,13 @@ pub enum NamespaceError {
     #[snafu(display("Table column not found: {message}"))]
     TableColumnNotFound { message: String },
 
+    /// The specified table column does not exist with suggestions.
+    #[snafu(display("Table column not found: {message}{}", suggestion.as_ref().map(|s| format!(". Did you mean '{}'?", s)).unwrap_or_else(|| "".to_string())))]
+    TableColumnNotFoundWithSuggestion {
+        message: String,
+        suggestion: Option<String>,
+    },
+
     /// Malformed request or invalid parameters.
     #[snafu(display("Invalid input: {message}"))]
     InvalidInput { message: String },
@@ -274,6 +281,7 @@ impl NamespaceError {
             Self::TransactionNotFound { .. } => ErrorCode::TransactionNotFound,
             Self::TableVersionNotFound { .. } => ErrorCode::TableVersionNotFound,
             Self::TableColumnNotFound { .. } => ErrorCode::TableColumnNotFound,
+            Self::TableColumnNotFoundWithSuggestion { .. } => ErrorCode::TableColumnNotFound,
             Self::InvalidInput { .. } => ErrorCode::InvalidInput,
             Self::ConcurrentModification { .. } => ErrorCode::ConcurrentModification,
             Self::PermissionDenied { .. } => ErrorCode::PermissionDenied,
